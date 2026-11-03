@@ -1,13 +1,17 @@
 # Agent Session Bridge
 
-Local Claude Code and Codex session metadata for macOS apps. A Swift library and a small CLI,
-shared by MH Desk Pets and Agent Town. Neither consumer needs the other app installed or running.
+[English](README.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md)
+
+Local Claude Code and Codex session metadata for macOS apps, available as a Swift library and a small CLI.
+Applications can share session detection and hooks while being installed and run independently.
 
 Requires macOS 14+ and Swift 6 (Xcode Command Line Tools). No package dependencies or background daemon.
 
 ## Build and install
 
 ```sh
+git clone https://github.com/chesterXalan/agent-session-bridge.git
+cd agent-session-bridge
 make build
 .build/release/agent-session-bridge install
 ```
@@ -27,7 +31,7 @@ For Codex it responds with `{}`. Use `--home DIR` to test against an isolated ho
 
 `uninstall` removes the shared hooks for **all consumers**; it keeps the runtime and records.
 Use `--provider claude|codex` with install/uninstall to limit the change to one provider.
-Deleting either consumer app does not remove the shared runtime or hooks.
+Deleting a consumer app does not remove the shared runtime or hooks.
 
 ## Integration
 
@@ -36,17 +40,15 @@ Clone them with `--recurse-submodules`, or run `git submodule update --init --re
 Swift apps depend on the `AgentSessionCore` library through a local Swift package dependency.
 Other runtimes invoke the standalone CLI without a shell.
 
-Update the submodule commit deliberately after running both consumer test suites. Build scripts never follow the
+Update the submodule commit deliberately after testing the consuming applications. Build scripts never follow the
 latest branch automatically. Consumers can build and bundle their pinned helper, then explicitly install it at the
 shared path. Keep the CLI output and stored record format backward compatible within this initial protocol.
 
-## Data and migration
+## Data and privacy
 
 Metadata lives in `~/Library/Application Support/AgentSessionBridge/sessions/`.
-During migration, readers also accept old `~/Library/Application Support/DeskPets/sessions/` records;
-the latest matching record wins. This compatibility path is optional and is not needed for fresh installations.
-Installing hooks replaces the legacy `deskpets-hook-v1` entries with a single `agent-session-bridge-v1` entry per event.
-Unrelated settings and hooks are preserved, with `*.agent-session-bridge-<time>.bak` backups before changes.
+Hook installation preserves unrelated settings and hooks, with `*.agent-session-bridge-<time>.bak` backups before changes.
+For older installations, see the [migration guide](docs/migration.md).
 
 Process matching prefers PID plus start time, then an explicit conversation ID. The limited Codex directory fallback
 requires one eligible process and one recent conversation; it never guesses between multiple sessions.
@@ -56,11 +58,15 @@ No prompts, tool arguments, terminal output, or conversation messages are stored
 Friendly titles use Codex's title index and bounded reads of Claude transcript title metadata.
 The bridge makes no network requests; cmux title lookup uses its local CLI.
 
-## Development and attribution
+## Development
 
 Run `make test` and `make build`. Tests cover provider/terminal/directory combinations, ambiguous identities,
 title lookup, legacy migration, hook preservation, and standalone runtime installation.
 
-Extracted from [chesterXalan/mh-desk-pets](https://github.com/chesterXalan/mh-desk-pets)
-at `ac97087`, originally based on [youngOman/desk-pets](https://github.com/youngOman/desk-pets).
+Keep the English, Traditional Chinese, and Japanese README files in sync when changing setup or behavior.
+Technical documentation and code comments remain in English.
+
+## Credits
+
+Extracted from [MH Desk Pets](https://github.com/chesterXalan/mh-desk-pets), based on [youngOman/desk-pets](https://github.com/youngOman/desk-pets).
 Distributed under the [MIT License](LICENSE), retaining both copyright notices.
